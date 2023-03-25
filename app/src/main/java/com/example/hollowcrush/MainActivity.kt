@@ -2,6 +2,8 @@ package com.example.hollowcrush
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
 import android.util.DisplayMetrics
 import android.view.ViewGroup.LayoutParams
 import android.widget.ImageView
@@ -21,6 +23,11 @@ class MainActivity : AppCompatActivity() {
         R.drawable.quick_focus, R.drawable.void_heart
     )
     private val charmsImgViews = mutableListOf<ImageView>()
+    private var charmToBeDragged = 0
+    private var charmToBeReplaced = 0
+    private var notCharm = R.drawable.ic_launcher_background
+    private lateinit var mHandler: Handler
+    private val interval = 100
 
     override fun onCreate(savedInstanceState: Bundle?) = try {
         super.onCreate(savedInstanceState)
@@ -36,6 +43,10 @@ class MainActivity : AppCompatActivity() {
         widthOfBlock = widthOfScreen / numOfBlocks
         loadGameBoard()
         addListenersToCharms()
+
+        mHandler = Handler()
+        startRepeat()
+
     } catch (ex: Exception) {
         error(ex)
     }
@@ -46,15 +57,16 @@ class MainActivity : AppCompatActivity() {
         binding.gameContainer.layoutParams.width = widthOfScreen
         binding.gameContainer.layoutParams.height = widthOfScreen
 
-        for (i in 0 until numOfBlocks*numOfBlocks) {
+        for (i in 0 until numOfBlocks * numOfBlocks) {
             val imageView = ImageView(this)
             imageView.id = i
-            imageView.layoutParams = LayoutParams(widthOfBlock,widthOfBlock)
+            imageView.layoutParams = LayoutParams(widthOfBlock, widthOfBlock)
             imageView.maxHeight = widthOfBlock
             imageView.maxWidth = widthOfBlock
 
-            val randomImage = Random.nextInt(0,charms.size)
+            val randomImage = Random.nextInt(0, charms.size)
             imageView.setImageResource(charms[randomImage])
+            imageView.tag = charms[randomImage]
             binding.gameContainer.addView(imageView)
             charmsImgViews.add(imageView)
         }
@@ -65,24 +77,84 @@ class MainActivity : AppCompatActivity() {
             imgView.setOnTouchListener(object : OnSwipeListener(this) { //Anonymous class
                 override fun onSwipeLeft() {
                     super.onSwipeLeft()
-                    Toast.makeText(this@MainActivity, "Left", Toast.LENGTH_SHORT).show()
+                    charmToBeDragged = imgView.id
+                    charmToBeReplaced = charmToBeDragged - 1
+                    charmInterchange()
                 }
 
                 override fun onSwipeRight() {
                     super.onSwipeRight()
-                    Toast.makeText(this@MainActivity, "Right", Toast.LENGTH_SHORT).show()
+                    charmToBeDragged = imgView.id
+                    charmToBeReplaced = charmToBeDragged + 1
+                    charmInterchange()
                 }
 
                 override fun onSwipeTop() {
                     super.onSwipeTop()
-                    Toast.makeText(this@MainActivity, "Top", Toast.LENGTH_SHORT).show()
+                    charmToBeDragged = imgView.id
+                    charmToBeReplaced = charmToBeDragged - numOfBlocks
+                    charmInterchange()
                 }
 
                 override fun onSwipeBottom() {
                     super.onSwipeBottom()
-                    Toast.makeText(this@MainActivity, "Bottom", Toast.LENGTH_SHORT).show()
+                    charmToBeDragged = imgView.id
+                    charmToBeReplaced = charmToBeDragged + numOfBlocks
+                    charmInterchange()
                 }
             })
         }
     }
+
+    private fun charmInterchange() {
+        val background = charmsImgViews[charmToBeReplaced].tag as Int
+        val background1 = charmsImgViews[charmToBeDragged].tag as Int
+
+        charmsImgViews[charmToBeDragged].setImageResource(background)
+        charmsImgViews[charmToBeReplaced].setImageResource(background1)
+        charmsImgViews[charmToBeDragged].tag = background
+        charmsImgViews[charmToBeReplaced].tag = background1
+    }
+
+    private fun checkRowForThree() {
+        for (i in 0 until 62) {
+            val choseCharm = charmsImgViews[i].tag as Int
+            var isBlank = charmsImgViews[i].tag == notCharm
+            val notValid = listOf(6, 7, 14, 15, 22, 23, 31, 38, 39, 46, 47, 54, 55)
+            if (!notValid.contains(i)) {
+                var x = i
+                if (charmsImgViews[x++].tag as Int == choseCharm && !isBlank
+                    && charmsImgViews[x++].tag as Int == choseCharm
+                    && charmsImgViews[x].tag as Int == choseCharm) {
+
+                    charmsImgViews[x].setImageResource(notCharm)
+                    charmsImgViews[x].tag = notCharm
+                    x--
+
+                    charmsImgViews[x].setImageResource(notCharm)
+                    charmsImgViews[x].tag = notCharm
+                    x--
+
+                    charmsImgViews[x].setImageResource(notCharm)
+                    charmsImgViews[x].tag = notCharm
+                }
+            }
+        }
+    }
+
+    var repeatChecker:Runnable = Runnable {
+        run {
+            try {
+                checkRowForThree()
+            } finally {
+                mHandler.postDelayed(repeatChecker, interval.toLong())
+            }
+        }
+    }
+
+    fun startRepeat() {
+        repeatChecker.run()
+    }
+
 }
+
