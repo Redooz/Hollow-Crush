@@ -32,12 +32,19 @@
         android:id="@+id/gameContainer"
         android:layout_width="match_parent"
         android:layout_height="400dp"
+        android:background="#ddd"
         android:orientation="horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topContainer" />
 
     <LinearLayout
+        android:id="@+id/infoContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#ddd"
         android:padding="12sp"
         app:layout_constraintBottom_toBottomOf="parent">
 
@@ -55,7 +62,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:gravity="center"
-            android:text="Moves: " />
+            android:text="Moves: "
+            android:textColor="@color/black" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

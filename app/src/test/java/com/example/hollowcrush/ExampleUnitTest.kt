@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.hollowcrush
 
 import org.junit.Test
 

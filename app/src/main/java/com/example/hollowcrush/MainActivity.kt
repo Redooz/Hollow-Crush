@@ -1,12 +1,12 @@
-package com.example.myapplication
+package com.example.hollowcrush
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.ViewGroup.LayoutParams
 import android.widget.ImageView
-import androidx.core.view.updateLayoutParams
-import com.example.myapplication.databinding.ActivityMainBinding
+import android.widget.Toast
+import com.example.hollowcrush.databinding.ActivityMainBinding
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         R.drawable.hiveblood, R.drawable.jonis_blessing,
         R.drawable.quick_focus, R.drawable.void_heart
     )
+    private val charmsImgViews = mutableListOf<ImageView>()
 
     override fun onCreate(savedInstanceState: Bundle?) = try {
         super.onCreate(savedInstanceState)
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity() {
 
         widthOfBlock = widthOfScreen / numOfBlocks
         loadGameBoard()
+        addListenersToCharms()
     } catch (ex: Exception) {
         error(ex)
     }
@@ -54,6 +56,33 @@ class MainActivity : AppCompatActivity() {
             val randomImage = Random.nextInt(0,charms.size)
             imageView.setImageResource(charms[randomImage])
             binding.gameContainer.addView(imageView)
+            charmsImgViews.add(imageView)
+        }
+    }
+
+    private fun addListenersToCharms() {
+        for (imgView in charmsImgViews) {
+            imgView.setOnTouchListener(object : OnSwipeListener(this) { //Anonymous class
+                override fun onSwipeLeft() {
+                    super.onSwipeLeft()
+                    Toast.makeText(this@MainActivity, "Left", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onSwipeRight() {
+                    super.onSwipeRight()
+                    Toast.makeText(this@MainActivity, "Right", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onSwipeTop() {
+                    super.onSwipeTop()
+                    Toast.makeText(this@MainActivity, "Top", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onSwipeBottom() {
+                    super.onSwipeBottom()
+                    Toast.makeText(this@MainActivity, "Bottom", Toast.LENGTH_SHORT).show()
+                }
+            })
         }
     }
 }
