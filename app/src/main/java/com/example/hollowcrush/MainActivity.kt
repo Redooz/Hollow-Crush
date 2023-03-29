@@ -23,9 +23,10 @@ class MainActivity : AppCompatActivity() {
     private val charmsImgViews = mutableListOf<ImageView>()
     private var charmToBeDragged = 0
     private var charmToBeReplaced = 0
-    private var notCharm = R.drawable.ic_launcher_background
+    private var notCharm = R.drawable.damage
     private lateinit var mHandler: Handler
     private val interval = 100
+    private var score = 0
 
     override fun onCreate(savedInstanceState: Bundle?) = try {
         super.onCreate(savedInstanceState)
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
         val displayMetrics = DisplayMetrics()
         windowManager.defaultDisplay.getMetrics(displayMetrics)
-
+        score = 0
         widthOfScreen = displayMetrics.widthPixels
         heigthOfScreen = displayMetrics.heightPixels
 
@@ -117,7 +118,7 @@ class MainActivity : AppCompatActivity() {
     private fun checkRowForThree() {
         for (i in 0 until 62) {
             val choseCharm = charmsImgViews[i].tag as Int
-            var isBlank = charmsImgViews[i].tag == notCharm
+            val isBlank = charmsImgViews[i].tag == notCharm
             val notValid = listOf(6, 7, 14, 15, 22, 23, 31, 38, 39, 46, 47, 54, 55)
             if (!notValid.contains(i)) {
                 var x = i
@@ -125,6 +126,9 @@ class MainActivity : AppCompatActivity() {
                     && charmsImgViews[x++].tag as Int == choseCharm
                     && charmsImgViews[x].tag as Int == choseCharm
                 ) {
+                    score += 3
+                    this.binding.scoreBar.progress = score
+                    this.binding.txtViewScore.text = this.binding.scoreBar.progress.toString()
 
                     charmsImgViews[x].setImageResource(notCharm)
                     charmsImgViews[x].tag = notCharm
@@ -139,6 +143,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+        moveDownCharms()
     }
 
     private fun checkColumnForThree() {
@@ -148,9 +153,12 @@ class MainActivity : AppCompatActivity() {
 
             var x = i
             if (charmsImgViews[x].tag as Int == chosedCharm && !isBlank
-                && charmsImgViews[x+numOfBlocks].tag as Int == chosedCharm
-                && charmsImgViews[x+2*numOfBlocks].tag as Int == chosedCharm
+                && charmsImgViews[x + numOfBlocks].tag as Int == chosedCharm
+                && charmsImgViews[x + 2 * numOfBlocks].tag as Int == chosedCharm
             ) {
+                score += 3
+                this.binding.scoreBar.progress = score
+                this.binding.txtViewScore.text = this.binding.scoreBar.progress.toString()
 
                 charmsImgViews[x].setImageResource(notCharm)
                 charmsImgViews[x].tag = notCharm
@@ -165,15 +173,44 @@ class MainActivity : AppCompatActivity() {
             }
 
         }
+        moveDownCharms()
     }
 
-    var repeatChecker: Runnable = Runnable {
+    private var repeatChecker: Runnable = Runnable {
         run {
             try {
                 checkRowForThree()
                 checkColumnForThree()
+                moveDownCharms()
             } finally {
                 mHandler.postDelayed(repeatChecker, interval.toLong())
+            }
+        }
+    }
+
+    fun moveDownCharms() {
+        val firstRow = listOf(0, 1, 2, 3, 4, 5, 6, 7)
+
+        for (i in 55 downTo 0) {
+            if (charmsImgViews[i + numOfBlocks].tag as Int == notCharm) {
+                charmsImgViews[i + numOfBlocks].setImageResource(charmsImgViews[i].tag as Int)
+                charmsImgViews[i + numOfBlocks].tag = charmsImgViews[i].tag as Int
+                charmsImgViews[i].setImageResource(notCharm)
+                charmsImgViews[i].tag = notCharm
+
+                if (firstRow.contains(i) && charmsImgViews[i].tag as Int == notCharm) {
+                    val randomCharm = Random.nextInt(0, charms.size)
+                    charmsImgViews[i].setImageResource(charms[randomCharm])
+                    charmsImgViews[i].tag = charms[randomCharm]
+                }
+            }
+        }
+
+        for (i in 0 until 8) {
+            if (charmsImgViews[i].tag as Int == notCharm){
+                val randomCharm = Random.nextInt(0, charms.size)
+                charmsImgViews[i].setImageResource(charms[randomCharm])
+                charmsImgViews[i].tag = charms[randomCharm]
             }
         }
     }
