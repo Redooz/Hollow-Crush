@@ -3,11 +3,9 @@ package com.example.hollowcrush
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.os.HandlerThread
 import android.util.DisplayMetrics
 import android.view.ViewGroup.LayoutParams
 import android.widget.ImageView
-import android.widget.Toast
 import com.example.hollowcrush.databinding.ActivityMainBinding
 import kotlin.random.Random
 
@@ -125,7 +123,8 @@ class MainActivity : AppCompatActivity() {
                 var x = i
                 if (charmsImgViews[x++].tag as Int == choseCharm && !isBlank
                     && charmsImgViews[x++].tag as Int == choseCharm
-                    && charmsImgViews[x].tag as Int == choseCharm) {
+                    && charmsImgViews[x].tag as Int == choseCharm
+                ) {
 
                     charmsImgViews[x].setImageResource(notCharm)
                     charmsImgViews[x].tag = notCharm
@@ -142,17 +141,44 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    var repeatChecker:Runnable = Runnable {
+    private fun checkColumnForThree() {
+        for (i in 0 until 47) {
+            val chosedCharm = charmsImgViews[i].tag as Int
+            val isBlank = charmsImgViews[i].tag == this.notCharm
+
+            var x = i
+            if (charmsImgViews[x].tag as Int == chosedCharm && !isBlank
+                && charmsImgViews[x+numOfBlocks].tag as Int == chosedCharm
+                && charmsImgViews[x+2*numOfBlocks].tag as Int == chosedCharm
+            ) {
+
+                charmsImgViews[x].setImageResource(notCharm)
+                charmsImgViews[x].tag = notCharm
+                x += numOfBlocks
+
+                charmsImgViews[x].setImageResource(notCharm)
+                charmsImgViews[x].tag = notCharm
+                x += numOfBlocks
+
+                charmsImgViews[x].setImageResource(notCharm)
+                charmsImgViews[x].tag = notCharm
+            }
+
+        }
+    }
+
+    var repeatChecker: Runnable = Runnable {
         run {
             try {
                 checkRowForThree()
+                checkColumnForThree()
             } finally {
                 mHandler.postDelayed(repeatChecker, interval.toLong())
             }
         }
     }
 
-    fun startRepeat() {
+    private fun startRepeat() {
         repeatChecker.run()
     }
 

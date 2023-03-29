@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@drawable/crystal_peak"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -20,7 +20,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:text="Lifes: "
-            android:textColor="@color/black"
+            android:textColor="@color/white"
+            android:textStyle="bold"
             android:textSize="40sp">
 
         </TextView>
@@ -32,7 +33,7 @@
         android:id="@+id/gameContainer"
         android:layout_width="match_parent"
         android:layout_height="400dp"
-        android:background="#ddd"
+        android:background="#68DED2F2"
         android:orientation="horizontal"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -44,7 +45,7 @@
         android:id="@+id/infoContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#ddd"
+        android:background="#68DED2F2"
         android:padding="12sp"
         app:layout_constraintBottom_toBottomOf="parent">
 
