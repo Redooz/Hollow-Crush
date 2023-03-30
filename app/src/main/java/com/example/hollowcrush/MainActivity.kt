@@ -6,6 +6,7 @@ import android.os.Handler
 import android.util.DisplayMetrics
 import android.view.ViewGroup.LayoutParams
 import android.widget.ImageView
+import androidx.appcompat.app.AlertDialog
 import com.example.hollowcrush.databinding.ActivityMainBinding
 import kotlin.random.Random
 
@@ -27,7 +28,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mHandler: Handler
     private val interval = 100
     private var score = 0
-
+    private var remainingMoves = 30
     override fun onCreate(savedInstanceState: Bundle?) = try {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -50,6 +51,32 @@ class MainActivity : AppCompatActivity() {
         error(ex)
     }
 
+    /**
+     * Show a dialog with a title and a message
+     * */
+    private fun showGameResultDialog(title: String, message: String) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(title)
+        builder.setMessage(message)
+        builder.setPositiveButton("Play Again") { dialog, which ->
+            finish()
+            startActivity(this.intent)
+        }
+        builder.setNegativeButton("Exit") { dialog, which ->
+            dialog.dismiss()
+            finish()
+        }
+        builder.setCancelable(false)
+        builder.show()
+
+    }
+
+    /**
+     * Sets the number of rows and columns in the game board,
+     * sets the layout parameters of the game container, creates image views for each block,
+     * sets the image resource and tag of each image view, adds the image views to the game container
+     * and adds the image views to a mutable list.
+     * */
     private fun loadGameBoard() {
         binding.gameContainer.rowCount = numOfBlocks
         binding.gameContainer.columnCount = numOfBlocks
@@ -71,6 +98,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Adds an anonymous class that extends OnSwipeListener to each image view in the mutable list.
+     * This class overrides the onSwipeLeft, onSwipeRight, onSwipeTop, and onSwipeBottom methods to handle
+     * swipes on the image views. The charmInterchange method is called from these methods and swaps the images
+     * of two image views when they are swiped.
+     * */
     private fun addListenersToCharms() {
         for (imgView in charmsImgViews) {
             imgView.setOnTouchListener(object : OnSwipeListener(this) { //Anonymous class
@@ -79,6 +112,9 @@ class MainActivity : AppCompatActivity() {
                     charmToBeDragged = imgView.id
                     charmToBeReplaced = charmToBeDragged - 1
                     charmInterchange()
+                    remainingMoves--
+                    binding.movesTxtView.text = "Remaning Moves: $remainingMoves"
+                    checkIfUserWonOrLost()
                 }
 
                 override fun onSwipeRight() {
@@ -86,6 +122,9 @@ class MainActivity : AppCompatActivity() {
                     charmToBeDragged = imgView.id
                     charmToBeReplaced = charmToBeDragged + 1
                     charmInterchange()
+                    remainingMoves--
+                    binding.movesTxtView.text = "Remaning Moves: $remainingMoves"
+                    checkIfUserWonOrLost()
                 }
 
                 override fun onSwipeTop() {
@@ -93,6 +132,9 @@ class MainActivity : AppCompatActivity() {
                     charmToBeDragged = imgView.id
                     charmToBeReplaced = charmToBeDragged - numOfBlocks
                     charmInterchange()
+                    remainingMoves--
+                    binding.movesTxtView.text = "Remaning Moves: $remainingMoves"
+                    checkIfUserWonOrLost()
                 }
 
                 override fun onSwipeBottom() {
@@ -100,11 +142,17 @@ class MainActivity : AppCompatActivity() {
                     charmToBeDragged = imgView.id
                     charmToBeReplaced = charmToBeDragged + numOfBlocks
                     charmInterchange()
+                    remainingMoves--
+                    binding.movesTxtView.text = "Remaning Moves: $remainingMoves"
+                    checkIfUserWonOrLost()
                 }
             })
         }
     }
 
+    /**
+     * Responsible for swapping the images of two charms when they are dragged and dropped in the grid
+     * */
     private fun charmInterchange() {
         val background = charmsImgViews[charmToBeReplaced].tag as Int
         val background1 = charmsImgViews[charmToBeDragged].tag as Int
@@ -115,6 +163,11 @@ class MainActivity : AppCompatActivity() {
         charmsImgViews[charmToBeReplaced].tag = background1
     }
 
+    /**
+     * Iterates through all the blocks on the game board and checks for three consecutive blocks of the same type in a row.
+     * If such a sequence is found, the score is increased, the blocks in the sequence are removed, and the blocks above the sequence are
+     * moved down to fill the gap.
+     * */
     private fun checkRowForThree() {
         for (i in 0 until 62) {
             val choseCharm = charmsImgViews[i].tag as Int
@@ -146,15 +199,20 @@ class MainActivity : AppCompatActivity() {
         moveDownCharms()
     }
 
+    /**
+     * Iterates through all the blocks on the game board and checks for three consecutive blocks of the same type in a column.
+     * If such a sequence is found, the score is increased, the blocks in the sequence are removed, and the blocks above the sequence are
+     * moved down to fill the gap.
+     * */
     private fun checkColumnForThree() {
         for (i in 0 until 47) {
-            val chosedCharm = charmsImgViews[i].tag as Int
+            val choseCharm = charmsImgViews[i].tag as Int
             val isBlank = charmsImgViews[i].tag == this.notCharm
 
             var x = i
-            if (charmsImgViews[x].tag as Int == chosedCharm && !isBlank
-                && charmsImgViews[x + numOfBlocks].tag as Int == chosedCharm
-                && charmsImgViews[x + 2 * numOfBlocks].tag as Int == chosedCharm
+            if (charmsImgViews[x].tag as Int == choseCharm && !isBlank
+                && charmsImgViews[x + numOfBlocks].tag as Int == choseCharm
+                && charmsImgViews[x + 2 * numOfBlocks].tag as Int == choseCharm
             ) {
                 score += 3
                 this.binding.scoreBar.progress = score
@@ -176,6 +234,20 @@ class MainActivity : AppCompatActivity() {
         moveDownCharms()
     }
 
+    /**
+     * Display a dialog showing if the user won or lost
+     * */
+    private fun checkIfUserWonOrLost() {
+        if (score > 100) {
+            showGameResultDialog("You Won", "Congratulations!")
+            mHandler.removeCallbacks(repeatChecker) // Stop the thread
+        }
+        if (remainingMoves == 0) {
+            showGameResultDialog("You Lost", "You run out of moves")
+            mHandler.removeCallbacks(repeatChecker) // Stop the thread
+        }
+    }
+
     private var repeatChecker: Runnable = Runnable {
         run {
             try {
@@ -188,7 +260,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun moveDownCharms() {
+    /**
+     * Moves all the blocks above an empty block down one row to fill the gap.
+     * */
+    private fun moveDownCharms() {
         val firstRow = listOf(0, 1, 2, 3, 4, 5, 6, 7)
 
         for (i in 55 downTo 0) {
@@ -207,7 +282,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         for (i in 0 until 8) {
-            if (charmsImgViews[i].tag as Int == notCharm){
+            if (charmsImgViews[i].tag as Int == notCharm) {
                 val randomCharm = Random.nextInt(0, charms.size)
                 charmsImgViews[i].setImageResource(charms[randomCharm])
                 charmsImgViews[i].tag = charms[randomCharm]

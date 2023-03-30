@@ -59,11 +59,12 @@
             android:progress="0" />
 
         <TextView
+            android:id="@+id/movesTxtView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:gravity="center"
-            android:text="Moves: "
+            android:text="Remaining Moves: "
             android:textColor="@color/black" />
 
     </LinearLayout>
