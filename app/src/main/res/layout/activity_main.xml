@@ -11,20 +11,33 @@
         android:id="@+id/topContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#68DED2F2"
+        android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
-            android:id="@+id/txtViewScore"
+            android:id="@+id/movesTxtView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:text="Lifes: "
+            android:text="Moves: 30"
             android:textColor="@color/white"
-            android:textStyle="bold"
-            android:textSize="40sp">
+            android:textSize="30sp"
+            android:textStyle="bold" />
 
-        </TextView>
+        <ProgressBar
+            android:id="@+id/scoreBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:layout_weight="0.5"
+            android:max="100"
+            android:progressDrawable="@drawable/purple_progress_bar"
+            android:layout_marginRight="12dp"
+            android:progress="0"
+            />
 
 
     </LinearLayout>
@@ -35,11 +48,11 @@
         android:layout_height="400dp"
         android:background="#68DED2F2"
         android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topContainer" />
+        app:layout_constraintTop_toBottomOf="@id/topContainer"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/infoContainer"
@@ -49,23 +62,26 @@
         android:padding="12sp"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <ProgressBar
-            android:id="@+id/scoreBar"
-            style="?android:attr/progressBarStyleHorizontal"
+        <Button
+            android:id="@+id/btnRestart"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginRight="12dp"
             android:layout_weight="0.5"
-            android:max="100"
-            android:progress="0" />
+            android:text="Restart"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/movesTxtView"
+        <Button
+            android:id="@+id/btnExit"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
-            android:gravity="center"
-            android:text="Remaining Moves: "
-            android:textColor="@color/black" />
+            android:text="Exit"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

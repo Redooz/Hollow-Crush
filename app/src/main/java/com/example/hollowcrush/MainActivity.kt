@@ -44,6 +44,14 @@ class MainActivity : AppCompatActivity() {
         loadGameBoard()
         addListenersToCharms()
 
+        this.binding.btnExit.setOnClickListener {
+            finish()
+        }
+
+        this.binding.btnRestart.setOnClickListener {
+            restartGame()
+        }
+
         mHandler = Handler()
         startRepeat()
 
@@ -59,8 +67,7 @@ class MainActivity : AppCompatActivity() {
         builder.setTitle(title)
         builder.setMessage(message)
         builder.setPositiveButton("Play Again") { dialog, which ->
-            finish()
-            startActivity(this.intent)
+            restartGame()
         }
         builder.setNegativeButton("Exit") { dialog, which ->
             dialog.dismiss()
@@ -69,6 +76,11 @@ class MainActivity : AppCompatActivity() {
         builder.setCancelable(false)
         builder.show()
 
+    }
+
+    private fun restartGame() {
+        finish()
+        startActivity(this.intent)
     }
 
     /**
@@ -113,7 +125,7 @@ class MainActivity : AppCompatActivity() {
                     charmToBeReplaced = charmToBeDragged - 1
                     charmInterchange()
                     remainingMoves--
-                    binding.movesTxtView.text = "Remaning Moves: $remainingMoves"
+                    binding.movesTxtView.text = "Moves: $remainingMoves"
                     checkIfUserWonOrLost()
                 }
 
@@ -123,7 +135,7 @@ class MainActivity : AppCompatActivity() {
                     charmToBeReplaced = charmToBeDragged + 1
                     charmInterchange()
                     remainingMoves--
-                    binding.movesTxtView.text = "Remaning Moves: $remainingMoves"
+                    binding.movesTxtView.text = "Moves: $remainingMoves"
                     checkIfUserWonOrLost()
                 }
 
@@ -133,7 +145,7 @@ class MainActivity : AppCompatActivity() {
                     charmToBeReplaced = charmToBeDragged - numOfBlocks
                     charmInterchange()
                     remainingMoves--
-                    binding.movesTxtView.text = "Remaning Moves: $remainingMoves"
+                    binding.movesTxtView.text = "Moves: $remainingMoves"
                     checkIfUserWonOrLost()
                 }
 
@@ -143,7 +155,7 @@ class MainActivity : AppCompatActivity() {
                     charmToBeReplaced = charmToBeDragged + numOfBlocks
                     charmInterchange()
                     remainingMoves--
-                    binding.movesTxtView.text = "Remaning Moves: $remainingMoves"
+                    binding.movesTxtView.text = "Moves: $remainingMoves"
                     checkIfUserWonOrLost()
                 }
             })
@@ -181,7 +193,6 @@ class MainActivity : AppCompatActivity() {
                 ) {
                     score += 3
                     this.binding.scoreBar.progress = score
-                    this.binding.txtViewScore.text = this.binding.scoreBar.progress.toString()
 
                     charmsImgViews[x].setImageResource(notCharm)
                     charmsImgViews[x].tag = notCharm
@@ -216,7 +227,6 @@ class MainActivity : AppCompatActivity() {
             ) {
                 score += 3
                 this.binding.scoreBar.progress = score
-                this.binding.txtViewScore.text = this.binding.scoreBar.progress.toString()
 
                 charmsImgViews[x].setImageResource(notCharm)
                 charmsImgViews[x].tag = notCharm
